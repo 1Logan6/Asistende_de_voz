@@ -108,7 +108,9 @@ def clock(rec):
             mixer.music.stop()
             break
         
-def add_webs():
+def add_webs_window():
+    global name_web_entry, route_web_entry
+    
     windows_webs = Toplevel()
     windows_webs.title("Agrega web")
     windows_webs.configure(bg="#33FFD1")
@@ -134,10 +136,12 @@ def add_webs():
     route_web_entry.pack(pady=1)
     
     
-    save_button = Button(windows_webs, text="Guardar", bg='#a17fe0', fg="white", width=8, height=2)
+    save_button = Button(windows_webs, text="Guardar", bg='#a17fe0', fg="white", width=8, height=2, command=add_webs)
     save_button.pack(pady=6)
 
-def add_apps():
+def add_apps_window():
+    global name_app_entry, route_app_entry
+    
     windows_apps = Toplevel()
     windows_apps.title("Agrega web")
     windows_apps.configure(bg="#33FFD1")
@@ -152,19 +156,35 @@ def add_apps():
     name_label = Label(windows_apps, text="Nombre de la aplicacion", fg="white", bg="#33FFD1", font=('Arial',15,'bold'))
     name_label.pack(pady=2)
     
-    name_web_entry = Entry(windows_apps, width=30)
-    name_web_entry.pack(pady=1)
+    name_app_entry = Entry(windows_apps, width=30)
+    name_app_entry.pack(pady=1)
     
     
     route_label = Label(windows_apps, text="Ruta de la aplicacion", fg="white", bg="#33FFD1", font=('Arial',15,'bold'))
     route_label.pack(pady=2)
     
-    route_web_entry = Entry(windows_apps, width=50)
-    route_web_entry.pack(pady=1)
+    route_app_entry = Entry(windows_apps, width=50)
+    route_app_entry.pack(pady=1)
     
     
-    save_button = Button(windows_apps, text="Guardar", bg='#a17fe0', fg="white", width=8, height=2)
+    save_button = Button(windows_apps, text="Guardar", bg='#a17fe0', fg="white", width=8, height=2, command=add_apps)
     save_button.pack(pady=6)
+    
+def add_webs():
+    name_web = name_web_entry.get().strip()
+    route_web = route_web_entry.get().strip()
+    
+    sites[name_web] = route_web
+    name_web_entry.delete(0, "end")
+    route_web_entry.delete(0, "end")
+
+def add_apps():
+    name_app = name_app_entry.get().strip()
+    route_app = route_app_entry.get().strip()
+    
+    programs[name_app] = route_app
+    name_app_entry.delete(0, "end")
+    route_app_entry.delete(0, "end")
 
 def talk(text):
     engine.say(text)
@@ -212,14 +232,19 @@ def run():
             t.start()
                 
         elif "abre" in rec:
-            for site in sites:
-                if site in rec:
-                    sub.call(f"start chrome.exe {sites[site]}", shell=True)
-                    talk(f"Abriendo {site}")
-            for app in programs:
-                if app in rec:
-                    talk(f"Abriendo {app}")
-                    os.startfile(programs[app])
+            task = rec.replace('abre','').strip()
+            if task in sites:
+                for task in sites:
+                    if task in rec:
+                        sub.call(f"start chrome.exe {sites[task]}", shell=True)
+                        talk(f"Abriendo {task}")
+            elif task in programs:
+                for task in programs:
+                    if task in rec:
+                        talk(f"Abriendo {task}")
+                        os.startfile(programs[task])
+            else:
+                talk(f"No se encontro {task} en ninguna parte, puedes agregarlo con los botones de la derecha")
 
         elif "escribe" in rec:
             try:
@@ -244,11 +269,11 @@ button_talk = Button(main_window, text="Hablar", fg="white", bg="#a17fe0",
 button_talk.pack(pady=11)
 
 button_add_webs = Button(main_window, text="Agregar paginas", fg="white", bg="#a17fe0",
-                       font=("Arial", 10, "bold"), width = 30, height= 5,  command=add_webs)
+                       font=("Arial", 10, "bold"), width = 30, height= 5,  command=add_webs_window)
 button_add_webs.place(x=1000, y=80, width=190, height=40)
 
 button_add_apps = Button(main_window, text="Agregar aplicaciones", fg="white", bg="#a17fe0",
-                       font=("Arial", 10, "bold"), width = 30, height= 5,  command=add_apps)
+                       font=("Arial", 10, "bold"), width = 30, height= 5,  command=add_apps_window)
 button_add_apps.place(x=1000, y=150, width=190, height=40)
 
 main_window.mainloop()
