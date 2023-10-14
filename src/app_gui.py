@@ -9,6 +9,7 @@ import subprocess as sub
 import os
 from tkinter import *
 from PIL import Image, ImageTk
+import threading as tr
 
 
 main_window = Tk()
@@ -84,7 +85,44 @@ def write(f):
     f.close()
     talk("Listo, puedes revisarlo")
     sub.Popen("notas.txt", shell=True)
+    
+def read_and_talk():
+    text = text_info.get("1.0","end")
+    talk(text)
+    
+def write_text(text_wiki):
+    text_info.insert(INSERT, text_wiki)
 
+def clock(rec):
+    num = rec.replace("alarma", "")
+    num = num.strip()
+    talk("Alarma programada para las " + num + " horas")
+    # Obtener la hora actual en el formato HH:MM
+    current_time = datetime.datetime.now().strftime("%H:%M")
+    # Esperar hasta que la hora actual coincida con la hora de la alarma
+    
+    if num[0] != '0' and len(num) <5:
+        num = '0' + num
+    print(num)
+    while True:
+        if datetime.datetime.now().strftime('%H:%M') == num:
+            print("Buenos dias dormilon!")
+            mixer.init()
+            mixer.music.load("Mariscones.mp3")
+            mixer.music.play()
+        else: 
+            continue
+        if keyboard.read_key() == 's':
+            mixer.music.stop()
+            break
+    
+    # while current_time != num:
+    #     current_time = datetime.datetime.now().strftime("%H:%M")
+
+    # print("Buenos dias dormilon!")
+    # mixer.init()
+    # mixer.music.load("Mariscones.mp3")
+    # mixer.music.play()
 
 def talk(text):
     engine.say(text)
@@ -117,32 +155,39 @@ def run():
             print("Reproduciendo " + music)
             talk("Reproduciendo " + music)
             pywhatkit.playonyt(music)
+            
         elif "busca" in rec:
             search = rec.replace("busca", "")
             wikipedia.set_lang("es")
             wiki = wikipedia.summary(search, 1)
             print(search + ": " + wiki)
             talk(wiki)
+            write_text(search + ": " + wiki)
+            break
+            
         elif "alarma" in rec:
-            num = rec.replace("alarma", "")
-            num = num.strip()
-            talk("Alarma programada para las " + num + " horas")
-            # Obtener la hora actual en el formato HH:MM
-            current_time = datetime.datetime.now().strftime("%H:%M")
-            # Esperar hasta que la hora actual coincida con la hora de la alarma
-            while current_time != num:
-                current_time = datetime.datetime.now().strftime("%H:%M")
+            t = tr.Thread(target=clock, args=(rec,))
+            t.start()
+            # num = rec.replace("alarma", "")
+            # num = num.strip()
+            # talk("Alarma programada para las " + num + " horas")
+            # # Obtener la hora actual en el formato HH:MM
+            # current_time = datetime.datetime.now().strftime("%H:%M")
+            # # Esperar hasta que la hora actual coincida con la hora de la alarma
+            # while current_time != num:
+            #     current_time = datetime.datetime.now().strftime("%H:%M")
 
-            print("Buenos dias dormilon!")
-            mixer.init()
-            mixer.music.load("Mariscones.mp3")
-            mixer.music.play()
+            # print("Buenos dias dormilon!")
+            # mixer.init()
+            # mixer.music.load("Mariscones.mp3")
+            # mixer.music.play()
 
             # Permitir al usuario detener la alarma con la tecla "s"
-            while True:
-                if keyboard.read_event().name == "s":
-                    mixer.music.stop()
-                    break
+            # while True:
+            #     if keyboard.read_event().name == "s":
+            #         mixer.music.stop()
+            #         break
+                
         elif "abre" in rec:
             for site in sites:
                 if site in rec:
@@ -169,5 +214,10 @@ def run():
 button_listen = Button(main_window, text="Escuchar", fg="white", bg="#a17fe0",
                        font=("Arial", 10, "bold"), width = 30, height= 5,  command=run)
 button_listen.pack(pady=10)
+
+button_talk = Button(main_window, text="Hablar", fg="white", bg="#a17fe0",
+                       font=("Arial", 10, "bold"), width = 30, height= 5,  command=read_and_talk)
+# button_talk.place(x=620, y=80, width=100, height=30)
+button_talk.pack(pady=11)
 
 main_window.mainloop()
