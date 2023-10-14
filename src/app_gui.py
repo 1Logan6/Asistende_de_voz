@@ -10,6 +10,7 @@ import os
 from tkinter import *
 from PIL import Image, ImageTk
 import threading as tr
+import conexion_total
 
 
 main_window = Tk()
@@ -63,12 +64,40 @@ engine.setProperty("rate", 145)
 # #Y esto hace que espere antes de otra accion
 # engine.runAndWait()
 
+def load_webs(sites):
+    conn = conexion_total.establecer_conexion()
+
+    try:
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM webs;")
+        resultados = cursor.fetchall()
+        for fila in resultados:
+            nombre_web, ruta_web = fila
+            sites[nombre_web] = ruta_web
+
+    finally:
+        conexion_total.cerrar_conexion(conn)
+
+def load_apps(programs):
+    conn = conexion_total.establecer_conexion()
+
+    try:
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM apps;")
+        resultados = cursor.fetchall()
+        for fila in resultados:
+            nombre_app, ruta_app = fila
+            programs[nombre_app] = ruta_app
+
+    finally:
+        conexion_total.cerrar_conexion(conn)
+
 # Diccionario de sitios web
 sites = {}
-
+load_webs(sites)
 # La r es porque da problema la cadena con los diagonales invertidos
 programs = {}
-
+load_apps(programs)
 
 def write(f):
     talk("¿Que quieres que escriba?")
@@ -174,6 +203,7 @@ def add_webs():
     name_web = name_web_entry.get().strip()
     route_web = route_web_entry.get().strip()
     
+    save_bd_web(name_web, route_web)
     sites[name_web] = route_web
     name_web_entry.delete(0, "end")
     route_web_entry.delete(0, "end")
@@ -182,9 +212,37 @@ def add_apps():
     name_app = name_app_entry.get().strip()
     route_app = route_app_entry.get().strip()
     
+    save_bd_app(name_app,route_app)
     programs[name_app] = route_app
     name_app_entry.delete(0, "end")
     route_app_entry.delete(0, "end")
+    
+def save_bd_web(nombre, ruta):
+    conn = conexion_total.establecer_conexion()
+    print(nombre," no ", ruta)
+
+    try:
+        print(nombre," si ", ruta)
+        cursor = conn.cursor()
+        cursor.execute("INSERT INTO webs (nombre_web, ruta_web) VALUES (%s, %s);", (nombre, ruta))
+        conn.commit()
+
+    finally:
+        conexion_total.cerrar_conexion(conn)
+        
+def save_bd_app(nombre, ruta):
+    conn = conexion_total.establecer_conexion()
+    print(nombre," no ", ruta)
+
+    try:
+        print(nombre," si ", ruta)
+        cursor = conn.cursor()
+        cursor.execute("INSERT INTO apps (nombre_app, ruta_app) VALUES (%s, %s);", (nombre, ruta))
+        conn.commit()
+
+    finally:
+        conexion_total.cerrar_conexion(conn)
+
 
 def talk(text):
     engine.say(text)

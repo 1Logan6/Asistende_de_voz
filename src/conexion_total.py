@@ -2,11 +2,11 @@ import psycopg2
 
 def establecer_conexion():
     conn = psycopg2.connect(
-        database="nombre_de_base_de_datos",
-        user="tu_usuario",
-        password="tu_contraseña",
-        host="localhost",
-        port="5432"
+        host = 'localhost',
+        user = 'Logan',
+        password = '16Dicdoky',
+        database = 'nueva_prueba',
+        port = '5432'
     )
     return conn
 
