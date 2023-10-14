@@ -64,18 +64,10 @@ engine.setProperty("rate", 145)
 # engine.runAndWait()
 
 # Diccionario de sitios web
-sites = {
-    "google": "google.com",
-    "youtube": "youtube.com",
-    "facebook": "facebook.com",
-    "whatsapp": "web.whatsapp.com",
-}
+sites = {}
 
 # La r es porque da problema la cadena con los diagonales invertidos
-programs = {
-    "spotify": r"C:\Users\saibo\AppData\Roaming\Spotify\Spotify.exe",
-    "discord": r"C:\Users\saibo\AppData\Local\Discord\app-1.0.9018\Discord.exe",
-}
+programs = {}
 
 
 def write(f):
@@ -115,14 +107,64 @@ def clock(rec):
         if keyboard.read_key() == 's':
             mixer.music.stop()
             break
+        
+def add_webs():
+    windows_webs = Toplevel()
+    windows_webs.title("Agrega web")
+    windows_webs.configure(bg="#33FFD1")
+    windows_webs.geometry("500x300")
+    windows_webs.resizable(0,0)
+    main_window.eval(f'tk::PlaceWindow {str(windows_webs)} center')
     
-    # while current_time != num:
-    #     current_time = datetime.datetime.now().strftime("%H:%M")
+    title_label = Label(windows_webs, text="Agregar sitio web", fg="white", bg="#33FFD1", font=('Arial',15,'bold'))
+    title_label.pack(pady=3)
+    
+    
+    name_label = Label(windows_webs, text="Nombre del sitio web", fg="white", bg="#33FFD1", font=('Arial',15,'bold'))
+    name_label.pack(pady=2)
+    
+    name_web_entry = Entry(windows_webs, width=30)
+    name_web_entry.pack(pady=1)
+    
+    
+    route_label = Label(windows_webs, text="Ruta del sitio web", fg="white", bg="#33FFD1", font=('Arial',15,'bold'))
+    route_label.pack(pady=2)
+    
+    route_web_entry = Entry(windows_webs, width=40)
+    route_web_entry.pack(pady=1)
+    
+    
+    save_button = Button(windows_webs, text="Guardar", bg='#a17fe0', fg="white", width=8, height=2)
+    save_button.pack(pady=6)
 
-    # print("Buenos dias dormilon!")
-    # mixer.init()
-    # mixer.music.load("Mariscones.mp3")
-    # mixer.music.play()
+def add_apps():
+    windows_apps = Toplevel()
+    windows_apps.title("Agrega web")
+    windows_apps.configure(bg="#33FFD1")
+    windows_apps.geometry("500x300")
+    windows_apps.resizable(0,0)
+    main_window.eval(f'tk::PlaceWindow {str(windows_apps)} center')
+    
+    title_label = Label(windows_apps, text="Agregar aplicacion", fg="white", bg="#33FFD1", font=('Arial',15,'bold'))
+    title_label.pack(pady=3)
+    
+    
+    name_label = Label(windows_apps, text="Nombre de la aplicacion", fg="white", bg="#33FFD1", font=('Arial',15,'bold'))
+    name_label.pack(pady=2)
+    
+    name_web_entry = Entry(windows_apps, width=30)
+    name_web_entry.pack(pady=1)
+    
+    
+    route_label = Label(windows_apps, text="Ruta de la aplicacion", fg="white", bg="#33FFD1", font=('Arial',15,'bold'))
+    route_label.pack(pady=2)
+    
+    route_web_entry = Entry(windows_apps, width=50)
+    route_web_entry.pack(pady=1)
+    
+    
+    save_button = Button(windows_apps, text="Guardar", bg='#a17fe0', fg="white", width=8, height=2)
+    save_button.pack(pady=6)
 
 def talk(text):
     engine.say(text)
@@ -168,25 +210,6 @@ def run():
         elif "alarma" in rec:
             t = tr.Thread(target=clock, args=(rec,))
             t.start()
-            # num = rec.replace("alarma", "")
-            # num = num.strip()
-            # talk("Alarma programada para las " + num + " horas")
-            # # Obtener la hora actual en el formato HH:MM
-            # current_time = datetime.datetime.now().strftime("%H:%M")
-            # # Esperar hasta que la hora actual coincida con la hora de la alarma
-            # while current_time != num:
-            #     current_time = datetime.datetime.now().strftime("%H:%M")
-
-            # print("Buenos dias dormilon!")
-            # mixer.init()
-            # mixer.music.load("Mariscones.mp3")
-            # mixer.music.play()
-
-            # Permitir al usuario detener la alarma con la tecla "s"
-            # while True:
-            #     if keyboard.read_event().name == "s":
-            #         mixer.music.stop()
-            #         break
                 
         elif "abre" in rec:
             for site in sites:
@@ -219,5 +242,13 @@ button_talk = Button(main_window, text="Hablar", fg="white", bg="#a17fe0",
                        font=("Arial", 10, "bold"), width = 30, height= 5,  command=read_and_talk)
 # button_talk.place(x=620, y=80, width=100, height=30)
 button_talk.pack(pady=11)
+
+button_add_webs = Button(main_window, text="Agregar paginas", fg="white", bg="#a17fe0",
+                       font=("Arial", 10, "bold"), width = 30, height= 5,  command=add_webs)
+button_add_webs.place(x=1000, y=80, width=190, height=40)
+
+button_add_apps = Button(main_window, text="Agregar aplicaciones", fg="white", bg="#a17fe0",
+                       font=("Arial", 10, "bold"), width = 30, height= 5,  command=add_apps)
+button_add_apps.place(x=1000, y=150, width=190, height=40)
 
 main_window.mainloop()
