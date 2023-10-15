@@ -243,6 +243,91 @@ def save_bd_app(nombre, ruta):
     finally:
         conexion_total.cerrar_conexion(conn)
 
+def list_webs(listado_webs):
+    conn = conexion_total.establecer_conexion()
+
+    try:
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM webs;")
+        resultados = cursor.fetchall()
+        for fila in resultados:
+            nombre_web, ruta_web = fila
+            listado_webs[nombre_web] = ruta_web
+
+    finally:
+        conexion_total.cerrar_conexion(conn)
+    
+
+listado_webs = {}
+list_webs(listado_webs)
+
+# def list_webs_window():
+#     windows_webs = Toplevel()
+#     windows_webs.title("Listas web")
+#     windows_webs.configure(bg="#33FFD1")
+#     windows_webs.geometry("500x300")
+#     windows_webs.resizable(0,0)
+#     main_window.eval(f'tk::PlaceWindow {str(windows_webs)} center')
+    
+#     title_label = Label(windows_webs, text="lista de apps", fg="white", bg="#33FFD1", font=('Arial',15,'bold'))
+#     title_label.pack(pady=3)
+    
+    
+#     name_label = Label(windows_webs, text="Nombre del sitio web", fg="white", bg="#33FFD1", font=('Arial',15,'bold'))
+#     name_label.pack(pady=2)
+    
+#     # name_web_entry = Entry(windows_webs, width=30)
+#     # name_web_entry.pack(pady=1)
+    
+    
+#     route_label = Label(windows_webs, text="Ruta del sitio web", fg="white", bg="#33FFD1", font=('Arial',15,'bold'))
+#     route_label.pack(pady=2)
+    
+#     # route_web_entry = Entry(windows_webs, width=40)
+#     # route_web_entry.pack(pady=1)
+    
+    
+#     # save_button = Button(windows_webs, text="Guardar", bg='#a17fe0', fg="white", width=8, height=2, command=add_webs)
+#     # save_button.pack(pady=6)
+
+def list_webs_window():
+    windows_webs = Toplevel()
+    windows_webs.title("Lista de Sitios Web")
+    windows_webs.configure(bg="#33FFD1")
+    windows_webs.geometry("500x300")
+    windows_webs.resizable(0, 0)
+    main_window.eval(f'tk::PlaceWindow {str(windows_webs)} center')
+
+    title_label = Label(windows_webs, text="Lista de Sitios Web", fg="white", bg="#33FFD1", font=('Arial', 15, 'bold'))
+    title_label.pack(pady=3)
+
+    # # Supongamos que tienes un diccionario con los sitios web
+    # sitios_web = {
+    #     "Sitio1": "Ruta1",
+    #     "Sitio2": "Ruta2",
+    #     "Sitio3": "Ruta3",
+    # }
+
+    listbox = Listbox(windows_webs)
+    listbox.pack(pady=5)
+
+    for nombre, ruta in listado_webs.items():
+        listbox.insert(END, nombre)
+
+    def mostrar_ruta_seleccionada(event):
+        seleccion = listbox.get(listbox.curselection())
+        ruta_label.config(text=f"Ruta del sitio web: {listado_webs[seleccion]}")
+
+    listbox.bind("<<ListboxSelect>>", mostrar_ruta_seleccionada)
+
+    ruta_label = Label(windows_webs, text="Ruta del sitio web:", fg="white", bg="#33FFD1", font=('Arial', 15, 'bold'))
+    ruta_label.pack(pady=2)
+
+    windows_webs.mainloop()
+
+
+def list_apps_window():
+    pass
 
 def talk(text):
     engine.say(text)
@@ -333,5 +418,13 @@ button_add_webs.place(x=1000, y=80, width=190, height=40)
 button_add_apps = Button(main_window, text="Agregar aplicaciones", fg="white", bg="#a17fe0",
                        font=("Arial", 10, "bold"), width = 30, height= 5,  command=add_apps_window)
 button_add_apps.place(x=1000, y=150, width=190, height=40)
+
+button_list_apps = Button(main_window, text="Listar aplicaciones", fg="white", bg="#a17fe0",
+                       font=("Arial", 10, "bold"), width = 30, height= 5,  command=list_apps_window)
+button_list_apps.place(x=1000, y=220, width=190, height=40)
+
+button_list_webs = Button(main_window, text="Listar sitios web", fg="white", bg="#a17fe0",
+                       font=("Arial", 10, "bold"), width = 30, height= 5,  command=list_webs_window)
+button_list_webs.place(x=1000, y=290, width=190, height=40)
 
 main_window.mainloop()
