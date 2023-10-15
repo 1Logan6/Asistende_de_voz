@@ -172,7 +172,7 @@ def add_apps_window():
     global name_app_entry, route_app_entry
     
     windows_apps = Toplevel()
-    windows_apps.title("Agrega web")
+    windows_apps.title("Agrega aplicacion")
     windows_apps.configure(bg="#33FFD1")
     windows_apps.geometry("500x300")
     windows_apps.resizable(0,0)
@@ -219,10 +219,8 @@ def add_apps():
     
 def save_bd_web(nombre, ruta):
     conn = conexion_total.establecer_conexion()
-    print(nombre," no ", ruta)
 
     try:
-        print(nombre," si ", ruta)
         cursor = conn.cursor()
         cursor.execute("INSERT INTO webs (nombre_web, ruta_web) VALUES (%s, %s);", (nombre, ruta))
         conn.commit()
@@ -232,10 +230,8 @@ def save_bd_web(nombre, ruta):
         
 def save_bd_app(nombre, ruta):
     conn = conexion_total.establecer_conexion()
-    print(nombre," no ", ruta)
 
     try:
-        print(nombre," si ", ruta)
         cursor = conn.cursor()
         cursor.execute("INSERT INTO apps (nombre_app, ruta_app) VALUES (%s, %s);", (nombre, ruta))
         conn.commit()
@@ -257,59 +253,89 @@ def list_webs(listado_webs):
     finally:
         conexion_total.cerrar_conexion(conn)
     
+def list_apps(listado_apps):
+    conn = conexion_total.establecer_conexion()
 
+    try:
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM apps;")
+        resultados = cursor.fetchall()
+        for fila in resultados:
+            nombre_app, ruta_app = fila
+            listado_apps[nombre_app] = ruta_app
+
+    finally:
+        conexion_total.cerrar_conexion(conn)
+
+def edit_webs(seleccion,nueva_ruta):
+    conn = conexion_total.establecer_conexion()
+
+    try:
+        cursor = conn.cursor()
+        cursor.execute("UPDATE webs SET ruta_web = %s WHERE nombre_web = %s;", (nueva_ruta,seleccion))
+        conn.commit()
+
+    finally:
+        conexion_total.cerrar_conexion(conn)
+
+def delete_webs(seleccion):
+    conn = conexion_total.establecer_conexion()
+    valor_a_eliminar = (seleccion,)
+
+    try:
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM webs WHERE nombre_web = %s;", valor_a_eliminar)
+        conn.commit()
+
+    finally:
+        conexion_total.cerrar_conexion(conn)
+
+def edit_apps(seleccion,nueva_ruta):
+    conn = conexion_total.establecer_conexion()
+
+    try:
+        cursor = conn.cursor()
+        cursor.execute("UPDATE apps SET ruta_app = %s WHERE nombre_app = %s;", (nueva_ruta,seleccion))
+        conn.commit()
+
+    finally:
+        conexion_total.cerrar_conexion(conn)
+
+def delete_apps(seleccion):
+    conn = conexion_total.establecer_conexion()
+    valor_a_eliminar = (seleccion,)
+
+    try:
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM apps WHERE nombre_app = %s;", valor_a_eliminar)
+        conn.commit()
+
+    finally:
+        conexion_total.cerrar_conexion(conn)
+    
 listado_webs = {}
 list_webs(listado_webs)
 
-# def list_webs_window():
-#     windows_webs = Toplevel()
-#     windows_webs.title("Listas web")
-#     windows_webs.configure(bg="#33FFD1")
-#     windows_webs.geometry("500x300")
-#     windows_webs.resizable(0,0)
-#     main_window.eval(f'tk::PlaceWindow {str(windows_webs)} center')
-    
-#     title_label = Label(windows_webs, text="lista de apps", fg="white", bg="#33FFD1", font=('Arial',15,'bold'))
-#     title_label.pack(pady=3)
-    
-    
-#     name_label = Label(windows_webs, text="Nombre del sitio web", fg="white", bg="#33FFD1", font=('Arial',15,'bold'))
-#     name_label.pack(pady=2)
-    
-#     # name_web_entry = Entry(windows_webs, width=30)
-#     # name_web_entry.pack(pady=1)
-    
-    
-#     route_label = Label(windows_webs, text="Ruta del sitio web", fg="white", bg="#33FFD1", font=('Arial',15,'bold'))
-#     route_label.pack(pady=2)
-    
-#     # route_web_entry = Entry(windows_webs, width=40)
-#     # route_web_entry.pack(pady=1)
-    
-    
-#     # save_button = Button(windows_webs, text="Guardar", bg='#a17fe0', fg="white", width=8, height=2, command=add_webs)
-#     # save_button.pack(pady=6)
+listado_apps = {}
+list_apps(listado_apps)
 
 def list_webs_window():
     windows_webs = Toplevel()
     windows_webs.title("Lista de Sitios Web")
     windows_webs.configure(bg="#33FFD1")
-    windows_webs.geometry("500x300")
+    # windows_webs.geometry("500x300")
+    windows_webs.geometry("800x500")
     windows_webs.resizable(0, 0)
     main_window.eval(f'tk::PlaceWindow {str(windows_webs)} center')
 
     title_label = Label(windows_webs, text="Lista de Sitios Web", fg="white", bg="#33FFD1", font=('Arial', 15, 'bold'))
     title_label.pack(pady=3)
 
-    # # Supongamos que tienes un diccionario con los sitios web
-    # sitios_web = {
-    #     "Sitio1": "Ruta1",
-    #     "Sitio2": "Ruta2",
-    #     "Sitio3": "Ruta3",
-    # }
-
     listbox = Listbox(windows_webs)
     listbox.pack(pady=5)
+    
+    listado_webs = {}
+    list_webs(listado_webs)
 
     for nombre, ruta in listado_webs.items():
         listbox.insert(END, nombre)
@@ -322,12 +348,96 @@ def list_webs_window():
 
     ruta_label = Label(windows_webs, text="Ruta del sitio web:", fg="white", bg="#33FFD1", font=('Arial', 15, 'bold'))
     ruta_label.pack(pady=2)
+    
+     # Botón para editar
+    def editar_sitio():
+        seleccion = listbox.get(listbox.curselection())
+        nueva_ruta = entrada_ruta.get()
+        listado_webs[seleccion] = nueva_ruta
+        ruta_label.config(text=f"Ruta del sitio web: {nueva_ruta}")
+        edit_webs(seleccion,nueva_ruta)
+        
+        
+
+    boton_editar = Button(windows_webs, text="Editar", fg="white", bg="#a17fe0",
+                       font=("Arial", 10, "bold"), command=editar_sitio)
+    boton_editar.pack(pady=5)
+
+    # Botón para eliminar
+    def eliminar_sitio():
+        seleccion = listbox.get(listbox.curselection())
+        del listado_webs[seleccion]
+        listbox.delete(listbox.curselection())
+        delete_webs(seleccion)
+
+    boton_eliminar = Button(windows_webs, text="Eliminar", fg="white", bg="#a17fe0",
+                       font=("Arial", 10, "bold"), command=eliminar_sitio)
+    boton_eliminar.pack()
+
+    entrada_ruta = Entry(windows_webs)
+    entrada_ruta.pack(pady=5)
 
     windows_webs.mainloop()
 
-
 def list_apps_window():
-    pass
+    windows_apps = Toplevel()
+    windows_apps.title("Lista de apps")
+    windows_apps.configure(bg="#33FFD1")
+    # windows_webs.geometry("500x300")
+    windows_apps.geometry("800x500")
+    windows_apps.resizable(0, 0)
+    main_window.eval(f'tk::PlaceWindow {str(windows_apps)} center')
+
+    title_label = Label(windows_apps, text="Lista de aplicaciones", fg="white", bg="#33FFD1", font=('Arial', 15, 'bold'))
+    title_label.pack(pady=3)
+
+    listbox = Listbox(windows_apps)
+    listbox.pack(pady=5)
+    
+    listado_apps = {}
+    list_apps(listado_apps)
+
+    for nombre, ruta in listado_apps.items():
+        listbox.insert(END, nombre)
+
+    def mostrar_ruta_seleccionada(event):
+        seleccion = listbox.get(listbox.curselection())
+        ruta_label.config(text=f"Ruta de la app: {listado_apps[seleccion]}",font=('Arial', 10, 'bold'))
+
+    listbox.bind("<<ListboxSelect>>", mostrar_ruta_seleccionada)
+
+    ruta_label = Label(windows_apps, text="Ruta de la app:", fg="white", bg="#33FFD1", font=('Arial', 15, 'bold'))
+    ruta_label.pack(pady=2)
+    
+     # Botón para editar
+    def editar_sitio():
+        seleccion = listbox.get(listbox.curselection())
+        nueva_ruta = entrada_ruta.get()
+        listado_apps[seleccion] = nueva_ruta
+        ruta_label.config(text=f"Ruta de la app: {nueva_ruta}")
+        edit_apps(seleccion,nueva_ruta)
+        
+        
+
+    boton_editar = Button(windows_apps, text="Editar", fg="white", bg="#a17fe0",
+                       font=("Arial", 10, "bold"), command=editar_sitio)
+    boton_editar.pack(pady=5)
+
+    # Botón para eliminar
+    def eliminar_sitio():
+        seleccion = listbox.get(listbox.curselection())
+        del listado_apps[seleccion]
+        listbox.delete(listbox.curselection())
+        delete_apps(seleccion)
+
+    boton_eliminar = Button(windows_apps, text="Eliminar", fg="white", bg="#a17fe0",
+                       font=("Arial", 10, "bold"), command=eliminar_sitio)
+    boton_eliminar.pack()
+
+    entrada_ruta = Entry(windows_apps,width=80)
+    entrada_ruta.pack(pady=5)
+
+    windows_apps.mainloop()
 
 def talk(text):
     engine.say(text)
@@ -374,7 +484,7 @@ def run():
             t = tr.Thread(target=clock, args=(rec,))
             t.start()
                 
-        elif "abre" in rec:
+        elif "abre" in rec:    
             task = rec.replace('abre','').strip()
             if task in sites:
                 for task in sites:
@@ -408,7 +518,6 @@ button_listen.pack(pady=10)
 
 button_talk = Button(main_window, text="Hablar", fg="white", bg="#a17fe0",
                        font=("Arial", 10, "bold"), width = 30, height= 5,  command=read_and_talk)
-# button_talk.place(x=620, y=80, width=100, height=30)
 button_talk.pack(pady=11)
 
 button_add_webs = Button(main_window, text="Agregar paginas", fg="white", bg="#a17fe0",
