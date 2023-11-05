@@ -34,7 +34,7 @@ canvas_comandos = Canvas(bg="#E100FF", height=300, width=280)
 canvas_comandos.place(x=0, y=0)
 canvas_comandos.create_text(120,80, text=comandos, fill="white", font='Arial 10')
 
-label_title=Label(main_window, text="Alex AI", bg=("#E684AE"), fg=("#240b36"),
+label_title=Label(main_window, text="Alex", bg=("#79CBCA"), fg=("#240b36"),
                   font=('Arial',30,'bold'))
 label_title.pack(pady=10)
 
