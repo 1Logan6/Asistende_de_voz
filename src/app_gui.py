@@ -9,6 +9,8 @@ import subprocess as sub
 import os
 from tkinter import *
 from PIL import Image, ImageTk
+import threading as tr
+import conexion_total
 
 
 main_window = Tk()
@@ -32,7 +34,7 @@ canvas_comandos = Canvas(bg="#E100FF", height=300, width=280)
 canvas_comandos.place(x=0, y=0)
 canvas_comandos.create_text(120,80, text=comandos, fill="white", font='Arial 10')
 
-label_title=Label(main_window, text="Alex AI", bg=("#E684AE"), fg=("#240b36"),
+label_title=Label(main_window, text="Alex", bg=("#79CBCA"), fg=("#240b36"),
                   font=('Arial',30,'bold'))
 label_title.pack(pady=10)
 
@@ -62,20 +64,40 @@ engine.setProperty("rate", 145)
 # #Y esto hace que espere antes de otra accion
 # engine.runAndWait()
 
+def load_webs(sites):
+    conn = conexion_total.establecer_conexion()
+
+    try:
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM webs;")
+        resultados = cursor.fetchall()
+        for fila in resultados:
+            nombre_web, ruta_web = fila
+            sites[nombre_web] = ruta_web
+
+    finally:
+        conexion_total.cerrar_conexion(conn)
+
+def load_apps(programs):
+    conn = conexion_total.establecer_conexion()
+
+    try:
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM apps;")
+        resultados = cursor.fetchall()
+        for fila in resultados:
+            nombre_app, ruta_app = fila
+            programs[nombre_app] = ruta_app
+
+    finally:
+        conexion_total.cerrar_conexion(conn)
+
 # Diccionario de sitios web
-sites = {
-    "google": "google.com",
-    "youtube": "youtube.com",
-    "facebook": "facebook.com",
-    "whatsapp": "web.whatsapp.com",
-}
-
+sites = {}
+load_webs(sites)
 # La r es porque da problema la cadena con los diagonales invertidos
-programs = {
-    "spotify": r"C:\Users\saibo\AppData\Roaming\Spotify\Spotify.exe",
-    "discord": r"C:\Users\saibo\AppData\Local\Discord\app-1.0.9018\Discord.exe",
-}
-
+programs = {}
+load_apps(programs)
 
 def write(f):
     talk("¿Que quieres que escriba?")
@@ -84,7 +106,338 @@ def write(f):
     f.close()
     talk("Listo, puedes revisarlo")
     sub.Popen("notas.txt", shell=True)
+    
+def read_and_talk():
+    text = text_info.get("1.0","end")
+    talk(text)
+    
+def write_text(text_wiki):
+    text_info.insert(INSERT, text_wiki)
 
+def clock(rec):
+    num = rec.replace("alarma", "")
+    num = num.strip()
+    talk("Alarma programada para las " + num + " horas")
+    # Obtener la hora actual en el formato HH:MM
+    current_time = datetime.datetime.now().strftime("%H:%M")
+    # Esperar hasta que la hora actual coincida con la hora de la alarma
+    
+    if num[0] != '0' and len(num) <5:
+        num = '0' + num
+    print(num)
+    while True:
+        if datetime.datetime.now().strftime('%H:%M') == num:
+            print("Buenos dias dormilon!")
+            mixer.init()
+            mixer.music.load("Mariscones.mp3")
+            mixer.music.play()
+        else: 
+            continue
+        if keyboard.read_key() == 's':
+            mixer.music.stop()
+            break
+        
+def add_webs_window():
+    global name_web_entry, route_web_entry
+    
+    windows_webs = Toplevel()
+    windows_webs.title("Agrega web")
+    windows_webs.configure(bg="#33FFD1")
+    windows_webs.geometry("500x300")
+    windows_webs.resizable(0,0)
+    main_window.eval(f'tk::PlaceWindow {str(windows_webs)} center')
+    
+    title_label = Label(windows_webs, text="Agregar sitio web", fg="white", bg="#33FFD1", font=('Arial',15,'bold'))
+    title_label.pack(pady=3)
+    
+    
+    name_label = Label(windows_webs, text="Nombre del sitio web", fg="white", bg="#33FFD1", font=('Arial',15,'bold'))
+    name_label.pack(pady=2)
+    
+    name_web_entry = Entry(windows_webs, width=30)
+    name_web_entry.pack(pady=1)
+    
+    
+    route_label = Label(windows_webs, text="Ruta del sitio web", fg="white", bg="#33FFD1", font=('Arial',15,'bold'))
+    route_label.pack(pady=2)
+    
+    route_web_entry = Entry(windows_webs, width=40)
+    route_web_entry.pack(pady=1)
+    
+    
+    save_button = Button(windows_webs, text="Guardar", bg='#a17fe0', fg="white", width=8, height=2, command=add_webs)
+    save_button.pack(pady=6)
+
+def add_apps_window():
+    global name_app_entry, route_app_entry
+    
+    windows_apps = Toplevel()
+    windows_apps.title("Agrega aplicacion")
+    windows_apps.configure(bg="#33FFD1")
+    windows_apps.geometry("500x300")
+    windows_apps.resizable(0,0)
+    main_window.eval(f'tk::PlaceWindow {str(windows_apps)} center')
+    
+    title_label = Label(windows_apps, text="Agregar aplicacion", fg="white", bg="#33FFD1", font=('Arial',15,'bold'))
+    title_label.pack(pady=3)
+    
+    
+    name_label = Label(windows_apps, text="Nombre de la aplicacion", fg="white", bg="#33FFD1", font=('Arial',15,'bold'))
+    name_label.pack(pady=2)
+    
+    name_app_entry = Entry(windows_apps, width=30)
+    name_app_entry.pack(pady=1)
+    
+    
+    route_label = Label(windows_apps, text="Ruta de la aplicacion", fg="white", bg="#33FFD1", font=('Arial',15,'bold'))
+    route_label.pack(pady=2)
+    
+    route_app_entry = Entry(windows_apps, width=50)
+    route_app_entry.pack(pady=1)
+    
+    
+    save_button = Button(windows_apps, text="Guardar", bg='#a17fe0', fg="white", width=8, height=2, command=add_apps)
+    save_button.pack(pady=6)
+    
+def add_webs():
+    name_web = name_web_entry.get().strip()
+    route_web = route_web_entry.get().strip()
+    
+    save_bd_web(name_web, route_web)
+    sites[name_web] = route_web
+    name_web_entry.delete(0, "end")
+    route_web_entry.delete(0, "end")
+
+def add_apps():
+    name_app = name_app_entry.get().strip()
+    route_app = route_app_entry.get().strip()
+    
+    save_bd_app(name_app,route_app)
+    programs[name_app] = route_app
+    name_app_entry.delete(0, "end")
+    route_app_entry.delete(0, "end")
+    
+def save_bd_web(nombre, ruta):
+    conn = conexion_total.establecer_conexion()
+
+    try:
+        cursor = conn.cursor()
+        cursor.execute("INSERT INTO webs (nombre_web, ruta_web) VALUES (%s, %s);", (nombre, ruta))
+        conn.commit()
+
+    finally:
+        conexion_total.cerrar_conexion(conn)
+        
+def save_bd_app(nombre, ruta):
+    conn = conexion_total.establecer_conexion()
+
+    try:
+        cursor = conn.cursor()
+        cursor.execute("INSERT INTO apps (nombre_app, ruta_app) VALUES (%s, %s);", (nombre, ruta))
+        conn.commit()
+
+    finally:
+        conexion_total.cerrar_conexion(conn)
+
+def list_webs(listado_webs):
+    conn = conexion_total.establecer_conexion()
+
+    try:
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM webs;")
+        resultados = cursor.fetchall()
+        for fila in resultados:
+            nombre_web, ruta_web = fila
+            listado_webs[nombre_web] = ruta_web
+
+    finally:
+        conexion_total.cerrar_conexion(conn)
+    
+def list_apps(listado_apps):
+    conn = conexion_total.establecer_conexion()
+
+    try:
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM apps;")
+        resultados = cursor.fetchall()
+        for fila in resultados:
+            nombre_app, ruta_app = fila
+            listado_apps[nombre_app] = ruta_app
+
+    finally:
+        conexion_total.cerrar_conexion(conn)
+
+def edit_webs(seleccion,nueva_ruta):
+    conn = conexion_total.establecer_conexion()
+
+    try:
+        cursor = conn.cursor()
+        cursor.execute("UPDATE webs SET ruta_web = %s WHERE nombre_web = %s;", (nueva_ruta,seleccion))
+        conn.commit()
+
+    finally:
+        conexion_total.cerrar_conexion(conn)
+
+def delete_webs(seleccion):
+    conn = conexion_total.establecer_conexion()
+    valor_a_eliminar = (seleccion,)
+
+    try:
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM webs WHERE nombre_web = %s;", valor_a_eliminar)
+        conn.commit()
+
+    finally:
+        conexion_total.cerrar_conexion(conn)
+
+def edit_apps(seleccion,nueva_ruta):
+    conn = conexion_total.establecer_conexion()
+
+    try:
+        cursor = conn.cursor()
+        cursor.execute("UPDATE apps SET ruta_app = %s WHERE nombre_app = %s;", (nueva_ruta,seleccion))
+        conn.commit()
+
+    finally:
+        conexion_total.cerrar_conexion(conn)
+
+def delete_apps(seleccion):
+    conn = conexion_total.establecer_conexion()
+    valor_a_eliminar = (seleccion,)
+
+    try:
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM apps WHERE nombre_app = %s;", valor_a_eliminar)
+        conn.commit()
+
+    finally:
+        conexion_total.cerrar_conexion(conn)
+    
+listado_webs = {}
+list_webs(listado_webs)
+
+listado_apps = {}
+list_apps(listado_apps)
+
+def list_webs_window():
+    windows_webs = Toplevel()
+    windows_webs.title("Lista de Sitios Web")
+    windows_webs.configure(bg="#33FFD1")
+    # windows_webs.geometry("500x300")
+    windows_webs.geometry("800x500")
+    windows_webs.resizable(0, 0)
+    main_window.eval(f'tk::PlaceWindow {str(windows_webs)} center')
+
+    title_label = Label(windows_webs, text="Lista de Sitios Web", fg="white", bg="#33FFD1", font=('Arial', 15, 'bold'))
+    title_label.pack(pady=3)
+
+    listbox = Listbox(windows_webs)
+    listbox.pack(pady=5)
+    
+    listado_webs = {}
+    list_webs(listado_webs)
+
+    for nombre, ruta in listado_webs.items():
+        listbox.insert(END, nombre)
+
+    def mostrar_ruta_seleccionada(event):
+        seleccion = listbox.get(listbox.curselection())
+        ruta_label.config(text=f"Ruta del sitio web: {listado_webs[seleccion]}")
+
+    listbox.bind("<<ListboxSelect>>", mostrar_ruta_seleccionada)
+
+    ruta_label = Label(windows_webs, text="Ruta del sitio web:", fg="white", bg="#33FFD1", font=('Arial', 15, 'bold'))
+    ruta_label.pack(pady=2)
+    
+     # Botón para editar
+    def editar_sitio():
+        seleccion = listbox.get(listbox.curselection())
+        nueva_ruta = entrada_ruta.get()
+        listado_webs[seleccion] = nueva_ruta
+        ruta_label.config(text=f"Ruta del sitio web: {nueva_ruta}")
+        edit_webs(seleccion,nueva_ruta)
+        
+        
+
+    boton_editar = Button(windows_webs, text="Editar", fg="white", bg="#a17fe0",
+                       font=("Arial", 10, "bold"), command=editar_sitio)
+    boton_editar.pack(pady=5)
+
+    # Botón para eliminar
+    def eliminar_sitio():
+        seleccion = listbox.get(listbox.curselection())
+        del listado_webs[seleccion]
+        listbox.delete(listbox.curselection())
+        delete_webs(seleccion)
+
+    boton_eliminar = Button(windows_webs, text="Eliminar", fg="white", bg="#a17fe0",
+                       font=("Arial", 10, "bold"), command=eliminar_sitio)
+    boton_eliminar.pack()
+
+    entrada_ruta = Entry(windows_webs)
+    entrada_ruta.pack(pady=5)
+
+    windows_webs.mainloop()
+
+def list_apps_window():
+    windows_apps = Toplevel()
+    windows_apps.title("Lista de apps")
+    windows_apps.configure(bg="#33FFD1")
+    # windows_webs.geometry("500x300")
+    windows_apps.geometry("800x500")
+    windows_apps.resizable(0, 0)
+    main_window.eval(f'tk::PlaceWindow {str(windows_apps)} center')
+
+    title_label = Label(windows_apps, text="Lista de aplicaciones", fg="white", bg="#33FFD1", font=('Arial', 15, 'bold'))
+    title_label.pack(pady=3)
+
+    listbox = Listbox(windows_apps)
+    listbox.pack(pady=5)
+    
+    listado_apps = {}
+    list_apps(listado_apps)
+
+    for nombre, ruta in listado_apps.items():
+        listbox.insert(END, nombre)
+
+    def mostrar_ruta_seleccionada(event):
+        seleccion = listbox.get(listbox.curselection())
+        ruta_label.config(text=f"Ruta de la app: {listado_apps[seleccion]}",font=('Arial', 10, 'bold'))
+
+    listbox.bind("<<ListboxSelect>>", mostrar_ruta_seleccionada)
+
+    ruta_label = Label(windows_apps, text="Ruta de la app:", fg="white", bg="#33FFD1", font=('Arial', 15, 'bold'))
+    ruta_label.pack(pady=2)
+    
+     # Botón para editar
+    def editar_sitio():
+        seleccion = listbox.get(listbox.curselection())
+        nueva_ruta = entrada_ruta.get()
+        listado_apps[seleccion] = nueva_ruta
+        ruta_label.config(text=f"Ruta de la app: {nueva_ruta}")
+        edit_apps(seleccion,nueva_ruta)
+        
+        
+
+    boton_editar = Button(windows_apps, text="Editar", fg="white", bg="#a17fe0",
+                       font=("Arial", 10, "bold"), command=editar_sitio)
+    boton_editar.pack(pady=5)
+
+    # Botón para eliminar
+    def eliminar_sitio():
+        seleccion = listbox.get(listbox.curselection())
+        del listado_apps[seleccion]
+        listbox.delete(listbox.curselection())
+        delete_apps(seleccion)
+
+    boton_eliminar = Button(windows_apps, text="Eliminar", fg="white", bg="#a17fe0",
+                       font=("Arial", 10, "bold"), command=eliminar_sitio)
+    boton_eliminar.pack()
+
+    entrada_ruta = Entry(windows_apps,width=80)
+    entrada_ruta.pack(pady=5)
+
+    windows_apps.mainloop()
 
 def talk(text):
     engine.say(text)
@@ -117,41 +470,34 @@ def run():
             print("Reproduciendo " + music)
             talk("Reproduciendo " + music)
             pywhatkit.playonyt(music)
+            
         elif "busca" in rec:
             search = rec.replace("busca", "")
             wikipedia.set_lang("es")
             wiki = wikipedia.summary(search, 1)
             print(search + ": " + wiki)
             talk(wiki)
+            write_text(search + ": " + wiki)
+            break
+            
         elif "alarma" in rec:
-            num = rec.replace("alarma", "")
-            num = num.strip()
-            talk("Alarma programada para las " + num + " horas")
-            # Obtener la hora actual en el formato HH:MM
-            current_time = datetime.datetime.now().strftime("%H:%M")
-            # Esperar hasta que la hora actual coincida con la hora de la alarma
-            while current_time != num:
-                current_time = datetime.datetime.now().strftime("%H:%M")
-
-            print("Buenos dias dormilon!")
-            mixer.init()
-            mixer.music.load("Mariscones.mp3")
-            mixer.music.play()
-
-            # Permitir al usuario detener la alarma con la tecla "s"
-            while True:
-                if keyboard.read_event().name == "s":
-                    mixer.music.stop()
-                    break
-        elif "abre" in rec:
-            for site in sites:
-                if site in rec:
-                    sub.call(f"start chrome.exe {sites[site]}", shell=True)
-                    talk(f"Abriendo {site}")
-            for app in programs:
-                if app in rec:
-                    talk(f"Abriendo {app}")
-                    os.startfile(programs[app])
+            t = tr.Thread(target=clock, args=(rec,))
+            t.start()
+                
+        elif "abre" in rec:    
+            task = rec.replace('abre','').strip()
+            if task in sites:
+                for task in sites:
+                    if task in rec:
+                        sub.call(f"start chrome.exe {sites[task]}", shell=True)
+                        talk(f"Abriendo {task}")
+            elif task in programs:
+                for task in programs:
+                    if task in rec:
+                        talk(f"Abriendo {task}")
+                        os.startfile(programs[task])
+            else:
+                talk(f"No se encontro {task} en ninguna parte, puedes agregarlo con los botones de la derecha")
 
         elif "escribe" in rec:
             try:
@@ -169,5 +515,25 @@ def run():
 button_listen = Button(main_window, text="Escuchar", fg="white", bg="#a17fe0",
                        font=("Arial", 10, "bold"), width = 30, height= 5,  command=run)
 button_listen.pack(pady=10)
+
+button_talk = Button(main_window, text="Hablar", fg="white", bg="#a17fe0",
+                       font=("Arial", 10, "bold"), width = 30, height= 5,  command=read_and_talk)
+button_talk.pack(pady=11)
+
+button_add_webs = Button(main_window, text="Agregar paginas", fg="white", bg="#a17fe0",
+                       font=("Arial", 10, "bold"), width = 30, height= 5,  command=add_webs_window)
+button_add_webs.place(x=1000, y=80, width=190, height=40)
+
+button_add_apps = Button(main_window, text="Agregar aplicaciones", fg="white", bg="#a17fe0",
+                       font=("Arial", 10, "bold"), width = 30, height= 5,  command=add_apps_window)
+button_add_apps.place(x=1000, y=150, width=190, height=40)
+
+button_list_apps = Button(main_window, text="Listar aplicaciones", fg="white", bg="#a17fe0",
+                       font=("Arial", 10, "bold"), width = 30, height= 5,  command=list_apps_window)
+button_list_apps.place(x=1000, y=220, width=190, height=40)
+
+button_list_webs = Button(main_window, text="Listar sitios web", fg="white", bg="#a17fe0",
+                       font=("Arial", 10, "bold"), width = 30, height= 5,  command=list_webs_window)
+button_list_webs.place(x=1000, y=290, width=190, height=40)
 
 main_window.mainloop()
