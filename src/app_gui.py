@@ -8,6 +8,7 @@ from pygame import mixer
 import subprocess as sub
 import os
 from tkinter import *
+from tkinter import ttk
 from PIL import Image, ImageTk
 import threading as tr
 import conexion_total
@@ -439,6 +440,92 @@ def list_apps_window():
 
     windows_apps.mainloop()
 
+def add_rutina_window():
+    global combo_accion, combo_nombre, combo_dia, entry_hora
+    
+    windows_rutina = Toplevel()
+    windows_rutina.title("Craer rutina")
+    windows_rutina.configure(bg="#33FFD1")
+    windows_rutina.geometry("700x450")
+    windows_rutina.resizable(0,0)
+    main_window.eval(f'tk::PlaceWindow {str(windows_rutina)} center')
+    
+    title_label = Label(windows_rutina, text="Agregar rutina", fg="white", bg="#33FFD1", font=('Arial',15,'bold'))
+    title_label.pack(pady=3)
+    
+    
+    name_label = Label(windows_rutina, text="Que accion quieres que se ejecute?", fg="white", bg="#33FFD1", font=('Arial',15,'bold'))
+    name_label.pack(pady=2)
+    
+    opciones = ["Abrir", "Reproducir"]
+    combo_accion = ttk.Combobox(windows_rutina, values=opciones)
+    combo_accion.set("Selecciona una opción")  # Valor por defecto
+    combo_accion.pack(pady=1)
+    
+    # name_web_entry = Entry(windows_rutina, width=30)
+    # name_web_entry.pack(pady=1)
+    
+    
+    route_label = Label(windows_rutina, text="Nombre del sitio web/app", fg="white", bg="#33FFD1", font=('Arial',15,'bold'))
+    route_label.pack(pady=2)
+    
+    
+    opciones_apps = list(sites.keys())
+    opciones_webs = list(programs.keys())
+    opciones = opciones_apps + opciones_webs
+    combo_nombre = ttk.Combobox(windows_rutina, values=opciones)
+    combo_nombre.set("Selecciona una opción")  # Valor por defecto
+    combo_nombre.pack(pady=1)
+    
+    # route_web_entry = Entry(windows_rutina, width=40)
+    # route_web_entry.pack(pady=1)
+    
+    name_label = Label(windows_rutina, text="Que dia quieres que se ejecute?", fg="white", bg="#33FFD1", font=('Arial',15,'bold'))
+    name_label.pack(pady=2)
+    
+    opciones = ["Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado", "Domingo"]
+    combo_dia = ttk.Combobox(windows_rutina, values=opciones)
+    combo_dia.set("Selecciona una opción")  # Valor por defecto
+    combo_dia.pack(pady=1)
+    
+    hora_label = Label(windows_rutina, text="Ingresa la hora (formato HH:MM)", fg="white", bg="#33FFD1",
+                          font=('Arial', 15, 'bold'))
+    hora_label.pack(pady=2)
+
+    entry_hora = ttk.Entry(windows_rutina)
+    entry_hora.pack(pady=1)
+    
+    save_button = Button(windows_rutina, text="Guardar", bg='#a17fe0', fg="white", width=8, height=2, command=add_rutina)
+    save_button.pack(pady=6)
+
+
+def add_rutina():
+    accion = combo_accion.get().strip()
+    app_web_nombre = combo_nombre.get().strip()
+    dia = combo_dia.get().strip()
+    hora = entry_hora.get().strip()
+    
+    print("accion"+accion+" nombre"+app_web_nombre+" dia"+dia+" hora"+hora)
+    
+    save_bd_rutina(accion, dia, hora, app_web_nombre)
+    
+    # Limpiar los campos después de crear la rutina
+    combo_accion.set("Selecciona una opción")
+    combo_nombre.set("Selecciona una opción")
+    combo_dia.set("Selecciona una opción")
+    entry_hora.delete(0, "end")
+    
+def save_bd_rutina(accion,dia,hora,app_web_nombre):
+    conn = conexion_total.establecer_conexion()
+
+    try:
+        cursor = conn.cursor()
+        cursor.execute("INSERT INTO rutinas (accion, dia, hora, app_web_nombre) VALUES (%s, %s, %s, %s);", (accion,dia,hora,app_web_nombre))
+        conn.commit()
+
+    finally:
+        conexion_total.cerrar_conexion(conn)
+
 def talk(text):
     engine.say(text)
     engine.runAndWait()
@@ -512,6 +599,9 @@ def run():
             except FileNotFoundError as e:
                 file = open("notas.txt", "w")
                 write(file)
+                
+        elif "rutina" in rec:
+            talk(f"Abriendo tas en rutina")
 
         elif "termina" in rec:
             talk("Adios bb!")
@@ -540,5 +630,9 @@ button_list_apps.place(x=1000, y=220, width=190, height=40)
 button_list_webs = Button(main_window, text="Listar sitios web", fg="white", bg="#a17fe0",
                        font=("Arial", 10, "bold"), width = 30, height= 5,  command=list_webs_window)
 button_list_webs.place(x=1000, y=290, width=190, height=40)
+
+button_add_webs = Button(main_window, text="Agregar rutina", fg="white", bg="#a17fe0",
+                       font=("Arial", 10, "bold"), width = 30, height= 5,  command=add_rutina_window)
+button_add_webs.place(x=1000, y=360, width=190, height=40)
 
 main_window.mainloop()
