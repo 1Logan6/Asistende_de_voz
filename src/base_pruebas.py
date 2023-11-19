@@ -6,7 +6,7 @@ def check_database_existence():
             host = 'localhost',
             user = 'Logan',
             password = '16Dicdoky',
-            database = 'moodM',
+            database = 'nueva_prueba',
             port = '5432'
         )
         cursor = connection.cursor()
@@ -24,12 +24,19 @@ def create_database_and_tables():
             host = 'localhost',
             user = 'Logan',
             password = '16Dicdoky',
-            database = 'moodM',
+            database = 'postgres',
             port = '5432'
         )
         cursor = connection.cursor()
         # Aquí ejecuta las sentencias SQL para crear la base de datos y las tablas
-        cursor.execute("CREATE DATABASE moodM;")
+        cursor.execute("""
+                       CREATE DATABASE pruebita
+                        WITH
+                        OWNER = postgres
+                        ENCODING = 'UTF8'
+                        CONNECTION LIMIT = -1
+                        IS_TEMPLATE = False;
+                       """)
         cursor.execute("""CREATE TABLE tablita 
                         (
                         nombre VARCHAR(255),

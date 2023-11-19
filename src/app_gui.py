@@ -453,6 +453,11 @@ def listen():
             rec = listener.recognize_google(voice, language="ES")
             rec = rec.lower()
             print(rec)
+            
+            # Esto sirve para corregir el error de detectar álex en lugar de alex.
+            if 'álex' in rec:
+                rec = rec.replace('álex', "alex")
+                
             if name in rec:
                 rec = rec.replace(name, "")
                 # print(rec)
