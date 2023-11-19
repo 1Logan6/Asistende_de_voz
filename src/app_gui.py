@@ -443,7 +443,7 @@ def list_apps_window():
     windows_apps.mainloop()
 
 def add_rutina_window():
-    global combo_accion, combo_nombre, combo_dia, entry_hora
+    global combo_accion, combo_nombre, combo_dia, entry_hora, entry_rutina
     
     windows_rutina = Toplevel()
     windows_rutina.title("Craer rutina")
@@ -455,6 +455,13 @@ def add_rutina_window():
     title_label = Label(windows_rutina, text="Agregar rutina", fg="white", bg="#33FFD1", font=('Arial',15,'bold'))
     title_label.pack(pady=3)
     
+    
+    nombre_label = Label(windows_rutina, text="Ingresa el nombre de la rutina", fg="white", bg="#33FFD1",
+                          font=('Arial', 15, 'bold'))
+    nombre_label.pack(pady=2)
+
+    entry_rutina = ttk.Entry(windows_rutina)
+    entry_rutina.pack(pady=1)
     
     name_label = Label(windows_rutina, text="Que accion quieres que se ejecute?", fg="white", bg="#33FFD1", font=('Arial',15,'bold'))
     name_label.pack(pady=2)
@@ -505,30 +512,32 @@ def add_rutina():
     app_web_nombre = combo_nombre.get().strip()
     dia = combo_dia.get().strip()
     hora = entry_hora.get().strip()
+    nombre_rutina = entry_rutina.get().strip()
     
     print("accion"+accion+" nombre"+app_web_nombre+" dia"+dia+" hora"+hora)
     
-    save_bd_rutina(accion, dia, hora, app_web_nombre)
+    save_bd_rutina(nombre_rutina, accion, dia, hora, app_web_nombre)
     
     # Limpiar los campos después de crear la rutina
     combo_accion.set("Selecciona una opción")
     combo_nombre.set("Selecciona una opción")
     combo_dia.set("Selecciona una opción")
     entry_hora.delete(0, "end")
+    entry_rutina.delete(0, "end")
     
-def save_bd_rutina(accion,dia,hora,app_web_nombre):
+def save_bd_rutina(nombre_rutina,accion,dia,hora,app_web_nombre):
     conn = conexion_total.establecer_conexion()
 
     try:
         cursor = conn.cursor()
-        cursor.execute("INSERT INTO rutinas (accion, dia, hora, app_web_nombre) VALUES (%s, %s, %s, %s);", (accion,dia,hora,app_web_nombre))
+        cursor.execute("INSERT INTO rutinas (nombre_rutina, accion, dia, hora, app_web_nombre) VALUES (%s, %s, %s, %s, %s);", (nombre_rutina,accion,dia,hora,app_web_nombre))
         conn.commit()
 
     finally:
         conexion_total.cerrar_conexion(conn)
 
 
-def load_rutinas():
+def load_rutinas(rutinas):
     
     # Obtener la fecha y hora actual
     fecha_y_hora_actual = datetime.now()
@@ -539,24 +548,25 @@ def load_rutinas():
     # Convertir el número del día de la semana a un nombre
     nombres_dias = ["Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado", "Domingo"]
     nombre_del_dia = nombres_dias[dia_de_la_semana]
-    nombre_del_dia = "Jueves"
+    nombre_del_dia = "Viernes"
     
     conn = conexion_total.establecer_conexion()
 
     try:
         cursor = conn.cursor()
-        cursor.execute("SELECT accion FROM rutinas where dia = %s;",(nombre_del_dia,))
+        cursor.execute("SELECT nombre_rutina,app_web_nombre, hora, accion FROM rutinas where dia = %s;",(nombre_del_dia,))
         resultados = cursor.fetchall()
-        # for fila in resultados:
-        #     nombre_web, ruta_web = fila
-        #     sites[nombre_web] = ruta_web
+        for fila in resultados:
+            nombre_rutina,app_web_nombre, hora, accion = fila
+            rutinas[nombre_rutina] = {'app_web_nombre':app_web_nombre,'hora': hora, 'accion': accion}
         print(resultados)
+        # print(rutinas[nombre_rutina]['accion'])
 
     finally:
         conexion_total.cerrar_conexion(conn)
 
 rutinas = {}
-load_rutinas()
+load_rutinas(rutinas)
 
 def accion_programada():
     # Coloca aquí la lógica de la acción que quieres realizar
