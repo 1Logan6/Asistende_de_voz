@@ -7,7 +7,7 @@ fecha_y_hora_actual = datetime.now()
 dia_de_la_semana = fecha_y_hora_actual.weekday()
 
 # Convertir el número del día de la semana a un nombre
-nombres_dias = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"]
+nombres_dias = ["Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado", "Domingo"]
 nombre_del_dia = nombres_dias[dia_de_la_semana]
 
 # Imprimir el resultado

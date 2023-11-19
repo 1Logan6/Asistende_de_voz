@@ -12,6 +12,8 @@ from tkinter import ttk
 from PIL import Image, ImageTk
 import threading as tr
 import conexion_total
+import time
+from datetime import datetime
 
 
 main_window = Tk()
@@ -498,7 +500,6 @@ def add_rutina_window():
     save_button = Button(windows_rutina, text="Guardar", bg='#a17fe0', fg="white", width=8, height=2, command=add_rutina)
     save_button.pack(pady=6)
 
-
 def add_rutina():
     accion = combo_accion.get().strip()
     app_web_nombre = combo_nombre.get().strip()
@@ -525,6 +526,56 @@ def save_bd_rutina(accion,dia,hora,app_web_nombre):
 
     finally:
         conexion_total.cerrar_conexion(conn)
+
+
+def load_rutinas():
+    
+    # Obtener la fecha y hora actual
+    fecha_y_hora_actual = datetime.now()
+
+    # Obtener el día de la semana (0 = lunes, 1 = martes, ..., 6 = domingo)
+    dia_de_la_semana = fecha_y_hora_actual.weekday()
+
+    # Convertir el número del día de la semana a un nombre
+    nombres_dias = ["Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado", "Domingo"]
+    nombre_del_dia = nombres_dias[dia_de_la_semana]
+    nombre_del_dia = "Jueves"
+    
+    conn = conexion_total.establecer_conexion()
+
+    try:
+        cursor = conn.cursor()
+        cursor.execute("SELECT accion FROM rutinas where dia = %s;",(nombre_del_dia,))
+        resultados = cursor.fetchall()
+        # for fila in resultados:
+        #     nombre_web, ruta_web = fila
+        #     sites[nombre_web] = ruta_web
+        print(resultados)
+
+    finally:
+        conexion_total.cerrar_conexion(conn)
+
+rutinas = {}
+load_rutinas()
+
+def accion_programada():
+    # Coloca aquí la lógica de la acción que quieres realizar
+    print("¡Acción realizada!")
+
+def ejecutar_accion_programada(hora_programada):
+    # Calcula el tiempo de espera hasta la hora programada
+    ahora = time.time()
+    tiempo_espera = max(0, hora_programada - ahora)
+
+    # Crea un hilo para ejecutar la acción programada
+    thread_accion = tr.Timer(tiempo_espera, accion_programada)
+    thread_accion.start()
+    
+# Define la hora programada (puedes obtener esto de tu base de datos)
+hora_programada = time.time() + 10  # Ejemplo: ejecutar la acción en 10 segundos
+
+# Ejecuta la acción programada
+ejecutar_accion_programada(hora_programada)
 
 def talk(text):
     engine.say(text)
