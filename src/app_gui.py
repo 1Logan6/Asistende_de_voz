@@ -548,7 +548,7 @@ def load_rutinas(rutinas):
     # Convertir el número del día de la semana a un nombre
     nombres_dias = ["Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado", "Domingo"]
     nombre_del_dia = nombres_dias[dia_de_la_semana]
-    nombre_del_dia = "Viernes"
+    # nombre_del_dia = "Viernes"
     
     conn = conexion_total.establecer_conexion()
 
@@ -560,6 +560,7 @@ def load_rutinas(rutinas):
             nombre_rutina,app_web_nombre, hora, accion = fila
             rutinas[nombre_rutina] = {'app_web_nombre':app_web_nombre,'hora': hora, 'accion': accion}
         print(resultados)
+        # print(rutinas['Cbum']['hora'])
         # print(rutinas[nombre_rutina]['accion'])
 
     finally:
@@ -568,24 +569,57 @@ def load_rutinas(rutinas):
 rutinas = {}
 load_rutinas(rutinas)
 
-def accion_programada():
-    # Coloca aquí la lógica de la acción que quieres realizar
-    print("¡Acción realizada!")
+# def accion_programada():
+#     # Coloca aquí la lógica de la acción que quieres realizar
+#     print("¡Acción realizada!")
 
-def ejecutar_accion_programada(hora_programada):
-    # Calcula el tiempo de espera hasta la hora programada
-    ahora = time.time()
-    tiempo_espera = max(0, hora_programada - ahora)
+# def ejecutar_accion_programada(hora_programada):
+#     # Calcula el tiempo de espera hasta la hora programada
+#     ahora = time.time()
+#     tiempo_espera = max(0, hora_programada - ahora)
 
-    # Crea un hilo para ejecutar la acción programada
-    thread_accion = tr.Timer(tiempo_espera, accion_programada)
-    thread_accion.start()
+#     # Crea un hilo para ejecutar la acción programada
+#     thread_accion = tr.Timer(tiempo_espera, accion_programada)
+#     thread_accion.start()
     
-# Define la hora programada (puedes obtener esto de tu base de datos)
-hora_programada = time.time() + 10  # Ejemplo: ejecutar la acción en 10 segundos
+# # Define la hora programada (puedes obtener esto de tu base de datos)
+# hora_programada = time.time() + 10  # Ejemplo: ejecutar la acción en 10 segundos
+# print(hora_programada)
+
+
+def ejecutar_rutinas_programadas(rutinas):
+    for nombre, datos in rutinas.items():
+        hora_rutina = convertir_a_timestamp(datos['hora'])
+        ahora = datetime.now()
+        rutina_time = datos['hora']
+        print("Esta es la hora de hoy:",ahora," y esta la de la rutina:",hora_rutina)
+        hora_minuto1 = ahora.time()
+        hora_minuto2 = hora_rutina.time()
+        print("Esta es la hora de hoy:",hora_minuto1," y esta la de la rutina:",hora_minuto2)
+        
+        if hora_minuto1 < hora_minuto2 or hora_minuto1 == hora_minuto2:
+            tiempo_espera = (hora_rutina - ahora).total_seconds()
+            print(f"Rutina: {nombre}, Hora programada: {hora_rutina}, Tiempo de espera: {tiempo_espera}")
+            thread_accion = tr.Timer(tiempo_espera, lambda: ejecutar_accion(datos['accion']))
+            thread_accion.start()
+
+def ejecutar_accion(accion):
+    # Aquí va la lógica para ejecut
+    print(f"Ejecutando {accion}!")
+    
+def convertir_a_timestamp(hora_str):
+    # Suponiendo que hora_str es una cadena en formato "HH:MM"
+    hora_programada = datetime.strptime(hora_str, "%H:%M")
+
+    # Combina la fecha actual con la hora programada
+    fecha_hora_programada = datetime.combine(datetime.now().date(), hora_programada.time())
+
+    # Retorna directamente el objeto datetime combinado
+    return fecha_hora_programada
 
 # Ejecuta la acción programada
-ejecutar_accion_programada(hora_programada)
+# ejecutar_accion_programada(hora_programada)
+ejecutar_rutinas_programadas(rutinas)
 
 def talk(text):
     engine.say(text)
