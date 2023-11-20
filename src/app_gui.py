@@ -443,12 +443,12 @@ def list_apps_window():
     windows_apps.mainloop()
 
 def add_rutina_window():
-    global combo_accion, combo_nombre, combo_dia, entry_hora, entry_rutina
+    global combo_accion, combo_nombre, combo_dia, entry_hora, entry_rutina, entry_cancion
     
     windows_rutina = Toplevel()
     windows_rutina.title("Craer rutina")
     windows_rutina.configure(bg="#33FFD1")
-    windows_rutina.geometry("700x450")
+    windows_rutina.geometry("700x600")
     windows_rutina.resizable(0,0)
     main_window.eval(f'tk::PlaceWindow {str(windows_rutina)} center')
     
@@ -475,7 +475,7 @@ def add_rutina_window():
     # name_web_entry.pack(pady=1)
     
     
-    route_label = Label(windows_rutina, text="Nombre del sitio web/app", fg="white", bg="#33FFD1", font=('Arial',15,'bold'))
+    route_label = Label(windows_rutina, text="Nombre del sitio web/app \n en el caso de haber seleccionado 'Abrir'", fg="white", bg="#33FFD1", font=('Arial',15,'bold'))
     route_label.pack(pady=2)
     
     
@@ -483,7 +483,7 @@ def add_rutina_window():
     opciones_webs = list(programs.keys())
     opciones = opciones_apps + opciones_webs
     combo_nombre = ttk.Combobox(windows_rutina, values=opciones)
-    combo_nombre.set("Selecciona una opción")  # Valor por defecto
+    combo_nombre.set("Nombre del sitio web/app")  # Valor por defecto
     combo_nombre.pack(pady=1)
     
     # route_web_entry = Entry(windows_rutina, width=40)
@@ -504,6 +504,13 @@ def add_rutina_window():
     entry_hora = ttk.Entry(windows_rutina)
     entry_hora.pack(pady=1)
     
+    cancion_label = Label(windows_rutina, text="Si la opcion deseada fue 'Reproducir' \n escribre el nombre de la cancion:", fg="white", bg="#33FFD1",
+                          font=('Arial', 15, 'bold'))
+    cancion_label.pack(pady=2)
+
+    entry_cancion = ttk.Entry(windows_rutina)
+    entry_cancion.pack(pady=1)
+    
     save_button = Button(windows_rutina, text="Guardar", bg='#a17fe0', fg="white", width=8, height=2, command=add_rutina)
     save_button.pack(pady=6)
 
@@ -513,10 +520,11 @@ def add_rutina():
     dia = combo_dia.get().strip()
     hora = entry_hora.get().strip()
     nombre_rutina = entry_rutina.get().strip()
+    cancion = entry_cancion.get().strip()
     
     print("accion"+accion+" nombre"+app_web_nombre+" dia"+dia+" hora"+hora)
     
-    save_bd_rutina(nombre_rutina, accion, dia, hora, app_web_nombre)
+    save_bd_rutina(nombre_rutina, accion, dia, hora, app_web_nombre, cancion)
     
     # Limpiar los campos después de crear la rutina
     combo_accion.set("Selecciona una opción")
@@ -524,13 +532,14 @@ def add_rutina():
     combo_dia.set("Selecciona una opción")
     entry_hora.delete(0, "end")
     entry_rutina.delete(0, "end")
+    entry_cancion.delete(0, "end")
     
-def save_bd_rutina(nombre_rutina,accion,dia,hora,app_web_nombre):
+def save_bd_rutina(nombre_rutina,accion,dia,hora,app_web_nombre, cancion):
     conn = conexion_total.establecer_conexion()
 
     try:
         cursor = conn.cursor()
-        cursor.execute("INSERT INTO rutinas (nombre_rutina, accion, dia, hora, app_web_nombre) VALUES (%s, %s, %s, %s, %s);", (nombre_rutina,accion,dia,hora,app_web_nombre))
+        cursor.execute("INSERT INTO rutinas (nombre_rutina, accion, dia, hora, app_web_nombre, cancion) VALUES (%s, %s, %s, %s, %s, %s);", (nombre_rutina,accion,dia,hora,app_web_nombre,cancion))
         conn.commit()
 
     finally:
@@ -554,11 +563,11 @@ def load_rutinas(rutinas):
 
     try:
         cursor = conn.cursor()
-        cursor.execute("SELECT nombre_rutina,app_web_nombre, hora, accion FROM rutinas where dia = %s;",(nombre_del_dia,))
+        cursor.execute("SELECT nombre_rutina,app_web_nombre, hora, accion, cancion FROM rutinas where dia = %s;",(nombre_del_dia,))
         resultados = cursor.fetchall()
         for fila in resultados:
-            nombre_rutina,app_web_nombre, hora, accion = fila
-            rutinas[nombre_rutina] = {'app_web_nombre':app_web_nombre,'hora': hora, 'accion': accion}
+            nombre_rutina,app_web_nombre, hora, accion, cancion = fila
+            rutinas[nombre_rutina] = {'app_web_nombre':app_web_nombre,'hora': hora, 'accion': accion, 'cancion': cancion}
         print(resultados)
         # print(rutinas['Cbum']['hora'])
         # print(rutinas[nombre_rutina]['accion'])
@@ -608,6 +617,7 @@ def ejecutar_accion(datos):
     # Aquí va la lógica para ejecut
     print(f"Ejecutando {datos['accion']} de {datos['app_web_nombre']} pagina app!")
     task = datos['app_web_nombre']
+    music = datos['cancion']
     
     if "Abrir" in {datos['accion']}:    
             if task in sites:
@@ -616,6 +626,11 @@ def ejecutar_accion(datos):
             elif task in programs:
                 talk(f"Abriendo {task}")
                 os.startfile(programs[task])
+    elif "Reproducir" in {datos['accion']}:
+            # music = rec.replace("reproduce", "")
+            print("Reproduciendo " + music)
+            talk("Reproduciendo " + music)
+            pywhatkit.playonyt(music)
     
 def convertir_a_timestamp(hora_str):
     # Suponiendo que hora_str es una cadena en formato "HH:MM"
