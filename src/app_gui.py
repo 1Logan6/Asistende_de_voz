@@ -600,12 +600,22 @@ def ejecutar_rutinas_programadas(rutinas):
         if hora_minuto1 < hora_minuto2 or hora_minuto1 == hora_minuto2:
             tiempo_espera = (hora_rutina - ahora).total_seconds()
             print(f"Rutina: {nombre}, Hora programada: {hora_rutina}, Tiempo de espera: {tiempo_espera}")
-            thread_accion = tr.Timer(tiempo_espera, lambda: ejecutar_accion(datos['accion']))
+            # thread_accion = tr.Timer(tiempo_espera, lambda: ejecutar_accion(datos['accion']))
+            thread_accion = tr.Timer(tiempo_espera, lambda: ejecutar_accion(datos))
             thread_accion.start()
 
-def ejecutar_accion(accion):
+def ejecutar_accion(datos):
     # Aquí va la lógica para ejecut
-    print(f"Ejecutando {accion}!")
+    print(f"Ejecutando {datos['accion']} de {datos['app_web_nombre']} pagina app!")
+    task = datos['app_web_nombre']
+    
+    if "Abrir" in {datos['accion']}:    
+            if task in sites:
+                sub.call(f"start chrome.exe {sites[task]}", shell=True)
+                talk(f"Abriendo {task}")
+            elif task in programs:
+                talk(f"Abriendo {task}")
+                os.startfile(programs[task])
     
 def convertir_a_timestamp(hora_str):
     # Suponiendo que hora_str es una cadena en formato "HH:MM"
