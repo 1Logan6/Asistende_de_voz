@@ -609,6 +609,7 @@ def ejecutar_rutinas_programadas(rutinas):
             # thread_accion = tr.Timer(tiempo_espera, lambda: ejecutar_accion(datos))
             # Con esto ya se almacena por separado
             thread_accion = tr.Timer(tiempo_espera, lambda datos=datos: ejecutar_accion(datos))
+            thread_accion.daemon = True
             thread_accion.start()
 
 def ejecutar_accion(datos):
