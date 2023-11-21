@@ -13,7 +13,7 @@ from PIL import Image, ImageTk
 import threading as tr
 import conexion_total
 import time
-from datetime import datetime
+from datetime import datetime, timedelta
 
 
 main_window = Tk()
@@ -522,9 +522,18 @@ def add_rutina():
     nombre_rutina = entry_rutina.get().strip()
     cancion = entry_cancion.get().strip()
     
-    print("accion"+accion+" nombre"+app_web_nombre+" dia"+dia+" hora"+hora)
+    print("accion: "+accion+" nombre: "+app_web_nombre+" dia: "+dia+" hora: "+hora)
     
     save_bd_rutina(nombre_rutina, accion, dia, hora, app_web_nombre, cancion)
+    # rutinas[nombre_rutina]= {
+    # "accion": accion,
+    # "hora": hora,
+    # "app_web_nombre": app_web_nombre,
+    # "cancion": cancion
+    # }
+    
+    # Esta opcion puede provocar problemas por repetirse varias veces el mismo hilo
+    # ejecutar_rutinas_programadas(rutinas)
     
     # Limpiar los campos después de crear la rutina
     combo_accion.set("Selecciona una opción")
@@ -578,39 +587,28 @@ def load_rutinas(rutinas):
 rutinas = {}
 load_rutinas(rutinas)
 
-# def accion_programada():
-#     # Coloca aquí la lógica de la acción que quieres realizar
-#     print("¡Acción realizada!")
-
-# def ejecutar_accion_programada(hora_programada):
-#     # Calcula el tiempo de espera hasta la hora programada
-#     ahora = time.time()
-#     tiempo_espera = max(0, hora_programada - ahora)
-
-#     # Crea un hilo para ejecutar la acción programada
-#     thread_accion = tr.Timer(tiempo_espera, accion_programada)
-#     thread_accion.start()
-    
-# # Define la hora programada (puedes obtener esto de tu base de datos)
-# hora_programada = time.time() + 10  # Ejemplo: ejecutar la acción en 10 segundos
-# print(hora_programada)
-
 
 def ejecutar_rutinas_programadas(rutinas):
     for nombre, datos in rutinas.items():
         hora_rutina = convertir_a_timestamp(datos['hora'])
         ahora = datetime.now()
         rutina_time = datos['hora']
-        print("Esta es la hora de hoy:",ahora," y esta la de la rutina:",hora_rutina)
+        # /////////////////////////////////print("Esta es la hora de hoy:",ahora," y esta la de la rutina:",hora_rutina)
         hora_minuto1 = ahora.time()
         hora_minuto2 = hora_rutina.time()
-        print("Esta es la hora de hoy:",hora_minuto1," y esta la de la rutina:",hora_minuto2)
+        hora_minuto3 = datetime.combine(ahora.date(), ahora.time())
+        hora_minuto3 += timedelta(minutes=1)
+        hora_minuto3 = hora_minuto3.time()
+        print("Esta es la hora de hoy:",hora_minuto1," y esta la de la rutina:",hora_minuto2," y esta la de la tole:",hora_minuto3)
         
-        if hora_minuto1 < hora_minuto2 or hora_minuto1 == hora_minuto2:
+        
+        if hora_minuto1 <= hora_minuto2:
             tiempo_espera = (hora_rutina - ahora).total_seconds()
             print(f"Rutina: {nombre}, Hora programada: {hora_rutina}, Tiempo de espera: {tiempo_espera}")
             # thread_accion = tr.Timer(tiempo_espera, lambda: ejecutar_accion(datos['accion']))
-            thread_accion = tr.Timer(tiempo_espera, lambda: ejecutar_accion(datos))
+            # thread_accion = tr.Timer(tiempo_espera, lambda: ejecutar_accion(datos))
+            # Con esto ya se almacena por separado
+            thread_accion = tr.Timer(tiempo_espera, lambda datos=datos: ejecutar_accion(datos))
             thread_accion.start()
 
 def ejecutar_accion(datos):
@@ -627,10 +625,11 @@ def ejecutar_accion(datos):
                 talk(f"Abriendo {task}")
                 os.startfile(programs[task])
     elif "Reproducir" in {datos['accion']}:
-            # music = rec.replace("reproduce", "")
             print("Reproduciendo " + music)
             talk("Reproduciendo " + music)
             pywhatkit.playonyt(music)
+    
+    time.sleep(5)
     
 def convertir_a_timestamp(hora_str):
     # Suponiendo que hora_str es una cadena en formato "HH:MM"
