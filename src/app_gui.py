@@ -21,7 +21,7 @@ main_window.title("Alex AI")
 
 main_window.geometry("1200x800")
 main_window.resizable(0,0)
-main_window.configure(bg='#79CBCA')
+main_window.configure(bg='#9fa3a9')
 
 comandos= """
     Los comandos que tiene Alex son:
@@ -33,15 +33,15 @@ comandos= """
     -Termina (cierra el microfono)
 """
 
-canvas_comandos = Canvas(bg="#E100FF", height=300, width=280)
+canvas_comandos = Canvas(bg="#171718", height=300, width=280)
 canvas_comandos.place(x=0, y=0)
 canvas_comandos.create_text(120,80, text=comandos, fill="white", font='Arial 10')
 
-label_title=Label(main_window, text="Alex", bg=("#79CBCA"), fg=("#240b36"),
+label_title=Label(main_window, text="Alex", bg=("#9fa3a9"), fg=("#171718"),
                   font=('Arial',30,'bold'))
 label_title.pack(pady=10)
 
-text_info = Text(main_window, bg="#E100FF", fg="white")
+text_info = Text(main_window, bg="#171718", fg="white")
 text_info.place(x=0, y=350, height=450, width=280)
 
 cbum_photo = ImageTk.PhotoImage(Image.open("cbum2.jpg"))
@@ -145,30 +145,30 @@ def add_webs_window():
     
     windows_webs = Toplevel()
     windows_webs.title("Agrega web")
-    windows_webs.configure(bg="#33FFD1")
+    windows_webs.configure(bg="#6a6e73")
     windows_webs.geometry("500x300")
     windows_webs.resizable(0,0)
     main_window.eval(f'tk::PlaceWindow {str(windows_webs)} center')
     
-    title_label = Label(windows_webs, text="Agregar sitio web", fg="white", bg="#33FFD1", font=('Arial',15,'bold'))
+    title_label = Label(windows_webs, text="Agregar sitio web", fg="white", bg="#6a6e73", font=('Arial',15,'bold'))
     title_label.pack(pady=3)
     
     
-    name_label = Label(windows_webs, text="Nombre del sitio web", fg="white", bg="#33FFD1", font=('Arial',15,'bold'))
+    name_label = Label(windows_webs, text="Nombre del sitio web", fg="white", bg="#6a6e73", font=('Arial',15,'bold'))
     name_label.pack(pady=2)
     
     name_web_entry = Entry(windows_webs, width=30)
     name_web_entry.pack(pady=1)
     
     
-    route_label = Label(windows_webs, text="Ruta del sitio web", fg="white", bg="#33FFD1", font=('Arial',15,'bold'))
+    route_label = Label(windows_webs, text="Ruta del sitio web", fg="white", bg="#6a6e73", font=('Arial',15,'bold'))
     route_label.pack(pady=2)
     
     route_web_entry = Entry(windows_webs, width=40)
     route_web_entry.pack(pady=1)
     
     
-    save_button = Button(windows_webs, text="Guardar", bg='#a17fe0', fg="white", width=8, height=2, command=add_webs)
+    save_button = Button(windows_webs, text="Guardar", bg='#9fa3a9', fg="white", width=8, height=2, command=add_webs)
     save_button.pack(pady=6)
 
 def add_apps_window():
@@ -176,30 +176,30 @@ def add_apps_window():
     
     windows_apps = Toplevel()
     windows_apps.title("Agrega aplicacion")
-    windows_apps.configure(bg="#33FFD1")
+    windows_apps.configure(bg="#6a6e73")
     windows_apps.geometry("500x300")
     windows_apps.resizable(0,0)
     main_window.eval(f'tk::PlaceWindow {str(windows_apps)} center')
     
-    title_label = Label(windows_apps, text="Agregar aplicacion", fg="white", bg="#33FFD1", font=('Arial',15,'bold'))
+    title_label = Label(windows_apps, text="Agregar aplicacion", fg="white", bg="#6a6e73", font=('Arial',15,'bold'))
     title_label.pack(pady=3)
     
     
-    name_label = Label(windows_apps, text="Nombre de la aplicacion", fg="white", bg="#33FFD1", font=('Arial',15,'bold'))
+    name_label = Label(windows_apps, text="Nombre de la aplicacion", fg="white", bg="#6a6e73", font=('Arial',15,'bold'))
     name_label.pack(pady=2)
     
     name_app_entry = Entry(windows_apps, width=30)
     name_app_entry.pack(pady=1)
     
     
-    route_label = Label(windows_apps, text="Ruta de la aplicacion", fg="white", bg="#33FFD1", font=('Arial',15,'bold'))
+    route_label = Label(windows_apps, text="Ruta de la aplicacion", fg="white", bg="#6a6e73", font=('Arial',15,'bold'))
     route_label.pack(pady=2)
     
     route_app_entry = Entry(windows_apps, width=50)
     route_app_entry.pack(pady=1)
     
     
-    save_button = Button(windows_apps, text="Guardar", bg='#a17fe0', fg="white", width=8, height=2, command=add_apps)
+    save_button = Button(windows_apps, text="Guardar", bg='#9fa3a9', fg="white", width=8, height=2, command=add_apps)
     save_button.pack(pady=6)
     
 def add_webs():
@@ -325,13 +325,13 @@ list_apps(listado_apps)
 def list_webs_window():
     windows_webs = Toplevel()
     windows_webs.title("Lista de Sitios Web")
-    windows_webs.configure(bg="#33FFD1")
+    windows_webs.configure(bg="#6a6e73")
     # windows_webs.geometry("500x300")
     windows_webs.geometry("800x500")
     windows_webs.resizable(0, 0)
     main_window.eval(f'tk::PlaceWindow {str(windows_webs)} center')
 
-    title_label = Label(windows_webs, text="Lista de Sitios Web", fg="white", bg="#33FFD1", font=('Arial', 15, 'bold'))
+    title_label = Label(windows_webs, text="Lista de Sitios Web", fg="white", bg="#6a6e73", font=('Arial', 15, 'bold'))
     title_label.pack(pady=3)
 
     listbox = Listbox(windows_webs)
@@ -349,7 +349,7 @@ def list_webs_window():
 
     listbox.bind("<<ListboxSelect>>", mostrar_ruta_seleccionada)
 
-    ruta_label = Label(windows_webs, text="Ruta del sitio web:", fg="white", bg="#33FFD1", font=('Arial', 15, 'bold'))
+    ruta_label = Label(windows_webs, text="Ruta del sitio web:", fg="white", bg="#6a6e73", font=('Arial', 15, 'bold'))
     ruta_label.pack(pady=2)
     
      # Botón para editar
@@ -362,7 +362,7 @@ def list_webs_window():
         
         
 
-    boton_editar = Button(windows_webs, text="Editar", fg="white", bg="#a17fe0",
+    boton_editar = Button(windows_webs, text="Editar", fg="white", bg="#9fa3a9",
                        font=("Arial", 10, "bold"), command=editar_sitio)
     boton_editar.pack(pady=5)
 
@@ -373,7 +373,7 @@ def list_webs_window():
         listbox.delete(listbox.curselection())
         delete_webs(seleccion)
 
-    boton_eliminar = Button(windows_webs, text="Eliminar", fg="white", bg="#a17fe0",
+    boton_eliminar = Button(windows_webs, text="Eliminar", fg="white", bg="#9fa3a9",
                        font=("Arial", 10, "bold"), command=eliminar_sitio)
     boton_eliminar.pack()
 
@@ -385,13 +385,13 @@ def list_webs_window():
 def list_apps_window():
     windows_apps = Toplevel()
     windows_apps.title("Lista de apps")
-    windows_apps.configure(bg="#33FFD1")
+    windows_apps.configure(bg="#6a6e73")
     # windows_webs.geometry("500x300")
     windows_apps.geometry("800x500")
     windows_apps.resizable(0, 0)
     main_window.eval(f'tk::PlaceWindow {str(windows_apps)} center')
 
-    title_label = Label(windows_apps, text="Lista de aplicaciones", fg="white", bg="#33FFD1", font=('Arial', 15, 'bold'))
+    title_label = Label(windows_apps, text="Lista de aplicaciones", fg="white", bg="#6a6e73", font=('Arial', 15, 'bold'))
     title_label.pack(pady=3)
 
     listbox = Listbox(windows_apps)
@@ -409,7 +409,7 @@ def list_apps_window():
 
     listbox.bind("<<ListboxSelect>>", mostrar_ruta_seleccionada)
 
-    ruta_label = Label(windows_apps, text="Ruta de la app:", fg="white", bg="#33FFD1", font=('Arial', 15, 'bold'))
+    ruta_label = Label(windows_apps, text="Ruta de la app:", fg="white", bg="#6a6e73", font=('Arial', 15, 'bold'))
     ruta_label.pack(pady=2)
     
      # Botón para editar
@@ -422,7 +422,7 @@ def list_apps_window():
         
         
 
-    boton_editar = Button(windows_apps, text="Editar", fg="white", bg="#a17fe0",
+    boton_editar = Button(windows_apps, text="Editar", fg="white", bg="#9fa3a9",
                        font=("Arial", 10, "bold"), command=editar_sitio)
     boton_editar.pack(pady=5)
 
@@ -433,7 +433,7 @@ def list_apps_window():
         listbox.delete(listbox.curselection())
         delete_apps(seleccion)
 
-    boton_eliminar = Button(windows_apps, text="Eliminar", fg="white", bg="#a17fe0",
+    boton_eliminar = Button(windows_apps, text="Eliminar", fg="white", bg="#9fa3a9",
                        font=("Arial", 10, "bold"), command=eliminar_sitio)
     boton_eliminar.pack()
 
@@ -447,23 +447,23 @@ def add_rutina_window():
     
     windows_rutina = Toplevel()
     windows_rutina.title("Craer rutina")
-    windows_rutina.configure(bg="#33FFD1")
+    windows_rutina.configure(bg="#6a6e73")
     windows_rutina.geometry("700x600")
     windows_rutina.resizable(0,0)
     main_window.eval(f'tk::PlaceWindow {str(windows_rutina)} center')
     
-    title_label = Label(windows_rutina, text="Agregar rutina", fg="white", bg="#33FFD1", font=('Arial',15,'bold'))
+    title_label = Label(windows_rutina, text="Agregar rutina", fg="white", bg="#6a6e73", font=('Arial',15,'bold'))
     title_label.pack(pady=3)
     
     
-    nombre_label = Label(windows_rutina, text="Ingresa el nombre de la rutina", fg="white", bg="#33FFD1",
+    nombre_label = Label(windows_rutina, text="Ingresa el nombre de la rutina", fg="white", bg="#6a6e73",
                           font=('Arial', 15, 'bold'))
     nombre_label.pack(pady=2)
 
     entry_rutina = ttk.Entry(windows_rutina)
     entry_rutina.pack(pady=1)
     
-    name_label = Label(windows_rutina, text="Que accion quieres que se ejecute?", fg="white", bg="#33FFD1", font=('Arial',15,'bold'))
+    name_label = Label(windows_rutina, text="Que accion quieres que se ejecute?", fg="white", bg="#6a6e73", font=('Arial',15,'bold'))
     name_label.pack(pady=2)
     
     opciones = ["Abrir", "Reproducir"]
@@ -475,7 +475,7 @@ def add_rutina_window():
     # name_web_entry.pack(pady=1)
     
     
-    route_label = Label(windows_rutina, text="Nombre del sitio web/app \n en el caso de haber seleccionado 'Abrir'", fg="white", bg="#33FFD1", font=('Arial',15,'bold'))
+    route_label = Label(windows_rutina, text="Nombre del sitio web/app \n en el caso de haber seleccionado 'Abrir'", fg="white", bg="#6a6e73", font=('Arial',15,'bold'))
     route_label.pack(pady=2)
     
     
@@ -489,7 +489,7 @@ def add_rutina_window():
     # route_web_entry = Entry(windows_rutina, width=40)
     # route_web_entry.pack(pady=1)
     
-    name_label = Label(windows_rutina, text="Que dia quieres que se ejecute?", fg="white", bg="#33FFD1", font=('Arial',15,'bold'))
+    name_label = Label(windows_rutina, text="Que dia quieres que se ejecute?", fg="white", bg="#6a6e73", font=('Arial',15,'bold'))
     name_label.pack(pady=2)
     
     opciones = ["Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado", "Domingo"]
@@ -497,21 +497,21 @@ def add_rutina_window():
     combo_dia.set("Selecciona una opción")  # Valor por defecto
     combo_dia.pack(pady=1)
     
-    hora_label = Label(windows_rutina, text="Ingresa la hora (formato HH:MM)", fg="white", bg="#33FFD1",
+    hora_label = Label(windows_rutina, text="Ingresa la hora (formato HH:MM)", fg="white", bg="#6a6e73",
                           font=('Arial', 15, 'bold'))
     hora_label.pack(pady=2)
 
     entry_hora = ttk.Entry(windows_rutina)
     entry_hora.pack(pady=1)
     
-    cancion_label = Label(windows_rutina, text="Si la opcion deseada fue 'Reproducir' \n escribre el nombre de la cancion:", fg="white", bg="#33FFD1",
+    cancion_label = Label(windows_rutina, text="Si la opcion deseada fue 'Reproducir' \n escribre el nombre de la cancion:", fg="white", bg="#6a6e73",
                           font=('Arial', 15, 'bold'))
     cancion_label.pack(pady=2)
 
     entry_cancion = ttk.Entry(windows_rutina)
     entry_cancion.pack(pady=1)
     
-    save_button = Button(windows_rutina, text="Guardar", bg='#a17fe0', fg="white", width=8, height=2, command=add_rutina)
+    save_button = Button(windows_rutina, text="Guardar", bg='#9fa3a9', fg="white", width=8, height=2, command=add_rutina)
     save_button.pack(pady=6)
 
 def add_rutina():
@@ -727,31 +727,31 @@ def run():
             talk("Adios bb!")
             break
 
-button_listen = Button(main_window, text="Escuchar", fg="white", bg="#a17fe0",
+button_listen = Button(main_window, text="Escuchar", fg="white", bg="#1f2124",
                        font=("Arial", 10, "bold"), width = 30, height= 5,  command=run)
 button_listen.pack(pady=10)
 
-button_talk = Button(main_window, text="Hablar", fg="white", bg="#a17fe0",
+button_talk = Button(main_window, text="Hablar", fg="white", bg="#1f2124",
                        font=("Arial", 10, "bold"), width = 30, height= 5,  command=read_and_talk)
 button_talk.pack(pady=11)
 
-button_add_webs = Button(main_window, text="Agregar paginas", fg="white", bg="#a17fe0",
+button_add_webs = Button(main_window, text="Agregar paginas", fg="white", bg="#393d42",
                        font=("Arial", 10, "bold"), width = 30, height= 5,  command=add_webs_window)
 button_add_webs.place(x=1000, y=80, width=190, height=40)
 
-button_add_apps = Button(main_window, text="Agregar aplicaciones", fg="white", bg="#a17fe0",
+button_add_apps = Button(main_window, text="Agregar aplicaciones", fg="white", bg="#393d42",
                        font=("Arial", 10, "bold"), width = 30, height= 5,  command=add_apps_window)
 button_add_apps.place(x=1000, y=150, width=190, height=40)
 
-button_list_apps = Button(main_window, text="Listar aplicaciones", fg="white", bg="#a17fe0",
+button_list_apps = Button(main_window, text="Listar aplicaciones", fg="white", bg="#393d42",
                        font=("Arial", 10, "bold"), width = 30, height= 5,  command=list_apps_window)
 button_list_apps.place(x=1000, y=220, width=190, height=40)
 
-button_list_webs = Button(main_window, text="Listar sitios web", fg="white", bg="#a17fe0",
+button_list_webs = Button(main_window, text="Listar sitios web", fg="white", bg="#393d42",
                        font=("Arial", 10, "bold"), width = 30, height= 5,  command=list_webs_window)
 button_list_webs.place(x=1000, y=290, width=190, height=40)
 
-button_add_webs = Button(main_window, text="Agregar rutina", fg="white", bg="#a17fe0",
+button_add_webs = Button(main_window, text="Agregar rutina", fg="white", bg="#393d42",
                        font=("Arial", 10, "bold"), width = 30, height= 5,  command=add_rutina_window)
 button_add_webs.place(x=1000, y=360, width=190, height=40)
 
